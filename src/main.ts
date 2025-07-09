@@ -5,9 +5,14 @@ import { PositionComponent } from "./components/PositionComponent";
 import { MovementSystem } from "./systems/MovementSystem";
 import { RenderComponent } from "./components/RenderComponent";
 import { RenderSystem } from "./systems/RenderSystem";
+import { InputComponent } from "./components/InputComponent";
+import { InputSystem } from "./systems/InputSystem";
+
 
 class MyGame extends Phaser.Scene {
   world = new World();
+  cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+
 
   preload() {
     this.load.image("player", "assets/player2.png");
@@ -15,6 +20,7 @@ class MyGame extends Phaser.Scene {
   }  
 
   create() {
+    this.cursors = this.input.keyboard?.createCursorKeys()!;
     const player = new Entity();
   
     // Crea sprite visual
@@ -24,16 +30,19 @@ class MyGame extends Phaser.Scene {
     // Añade componentes
     player
       .addComponent("position", new PositionComponent(100, 100))
-      .addComponent("render", new RenderComponent(sprite));
+      .addComponent("render", new RenderComponent(sprite))
+      .addComponent("input", new InputComponent());
+
   
     this.world.addEntity(player);
   
     // Sistemas
     this.world.addSystem(new MovementSystem());
     this.world.addSystem(new RenderSystem());
+    this.world.addSystem(new InputSystem(this.cursors));
+
   }
   
-
   update(time: number, delta: number) {
     this.world.update(delta / 1000); // convertir ms a segundos
   }
